@@ -8,7 +8,7 @@ Since this environment is much more complicated than the traditional gym,
 So each neural network has two hidden layers of **128** and **64** respectively.
 The input is the state of the environment, and the output is the expected reward of the action vector.
 ## Hyper parameters
-- total_episode
+- total_episode 2000
 - learning rate 0.001
 - replay_buffer_size 3000
 - mini_batch_size 64
