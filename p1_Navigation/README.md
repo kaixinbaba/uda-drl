@@ -33,5 +33,3 @@ pip install -r requirements.txt
 jupyter notebook
 ```
 Then open the Report.ipynb to see the report.
-
-
