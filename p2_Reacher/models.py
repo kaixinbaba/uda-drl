@@ -19,8 +19,9 @@ class Actor(torch.nn.Module):
     def forward(self, x):
         x = F.relu(self.hidden1(x))
         x = F.relu(self.hidden2(x))
-        x = F.tanh(self.out(x))
-        return x * self.a_bound
+        x = torch.tanh(self.out(x))
+        result = x * self.a_bound
+        return result
 
 
 class Critic(torch.nn.Module):

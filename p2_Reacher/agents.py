@@ -3,8 +3,6 @@ from copy import deepcopy
 import numpy as np
 import torch
 import torch.nn.functional as F
-import matplotlib.pyplot as plt
-import gym
 
 from memorys import ReplayBuffer
 from models import Actor, Critic
@@ -98,35 +96,3 @@ class DDPG(object):
     def _soft_update(self, eval_net, target_net):
         for eval, target in zip(eval_net.parameters(), target_net.parameters()):
             target.data.copy_(self.tau * eval.data + (1.0 - self.tau) * target.data)
-
-
-if __name__ == '__main__':
-    env = gym.make('Pendulum-v0').unwrapped
-    env.seed(7)
-    n_s = env.observation_space.shape[0]
-    n_a = env.action_space.shape[0]
-    a_bound = env.action_space.high[0]
-    ddpg = DDPG(n_s, n_a, a_bound)
-    rewards = []
-    var = 3  # control exploration
-    for e in range(200):
-        print(e)
-        s = env.reset()
-        total_reward = 0
-        for step in range(200):
-            env.render()
-            a = ddpg.choose_action(s)
-            s_, r, done, _ = env.step(a)
-            r /= 10
-            total_reward += r
-            ddpg.step(s, a, r, s_, done)
-            if done:
-                rewards.append(total_reward)
-                break
-            s = s_
-    # e-r
-    plt.xlabel('episode')
-    plt.ylabel('reward')
-    plt.title('result')
-    plt.plot(range(len(rewards)), rewards)
-    plt.show()

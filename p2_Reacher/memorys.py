@@ -14,7 +14,7 @@ class ReplayBuffer(object):
     def store(self, s, a, r, s_, done):
         transaction = np.hstack([s, a, r, done, s_])
         self.memory[self.pointer, :] = transaction
-        self.pointer = 0 if (self.pointer == self.memory_size) else (self.pointer + 1)
+        self.pointer = 0 if (self.pointer + 1 == self.memory_size) else (self.pointer + 1)
         self.memory_count += 1
 
     def sample(self, batch_size):
