@@ -7,7 +7,7 @@ class ReplayBuffer(object):
         self.n_s = n_s
         self.n_a = n_a
         self.memory_size = memory_size
-        self.memory = np.zeros([memory_size, n_s * 2 + n_a + 2])
+        self.memory = np.zeros([memory_size, n_s * 2 + n_a + 3])
         self.memory_count = 0
         self.pointer = 0
 

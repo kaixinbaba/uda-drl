@@ -62,9 +62,9 @@ class DDPG(object):
         mini_batch = self.replay_buffer.sample(self.batch_size)
         b_s = torch.FloatTensor(mini_batch[:, :self.n_s])
         b_a = torch.FloatTensor(mini_batch[:, self.n_s:self.n_s + self.n_a])
-        b_r = torch.FloatTensor(mini_batch[:, self.n_s + self.n_a:self.n_s + self.n_a + 1])
+        b_r = torch.FloatTensor(mini_batch[:, self.n_s + self.n_a:self.n_s + self.n_a + 2])
         b_s_ = torch.FloatTensor(mini_batch[:, -self.n_s:])
-        b_done = torch.FloatTensor(mini_batch[:, self.n_s + self.n_a + 1:self.n_s + self.n_a + 2])
+        b_done = torch.FloatTensor(mini_batch[:, self.n_s + self.n_a + 2:self.n_s + self.n_a + 3])
         # learn
         self.update_critic(b_s, b_a, b_r, b_s_, b_done)
         self.update_actor(b_s)
@@ -74,7 +74,7 @@ class DDPG(object):
         with torch.no_grad():
             target_next_a = self.target_actor(s_)
             next_a = self.target_critic(s_, target_next_a)
-            target_q = r + self.gamma * next_a * (1.0 - done)
+            target_q = torch.mean(r) + self.gamma * next_a * (1.0 - done)
         eval_q = self.eval_critic(s, a)
         critic_loss = F.mse_loss(eval_q, target_q)
         self.critic_optim.zero_grad()
