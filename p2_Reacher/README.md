@@ -86,3 +86,81 @@ Then, place the file in the `p2_continuous-control/` folder in the DRLND GitHub 
 
 (_For AWS_) If you'd like to train the agent on AWS (and have not [enabled a virtual screen](https://github.com/Unity-Technologies/ml-agents/blob/master/docs/Training-on-Amazon-Web-Service.md)), then please use [this link](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P2/Crawler/Crawler_Linux_NoVis.zip) to obtain the "headless" version of the environment.  You will **not** be able to watch the agent without enabling a virtual screen, but you will be able to train the agent.  (_To watch the agent, you should follow the instructions to [enable a virtual screen](https://github.com/Unity-Technologies/ml-agents/blob/master/docs/Training-on-Amazon-Web-Service.md), and then download the environment for the **Linux** operating system above._)
 
+
+
+## Set up
+```python
+# I use conda to manage virtual env
+conda create --name drlnd python=3.6
+source activate drlnd
+python -m ipykernel install --user --name drlnd --display-name "drlnd"
+git clone https://github.com/kaixinbaba/uda-drl.git
+cd uda-drl
+pip install -r requirements.txt
+jupyter notebook
+```
+# Reacher
+I use the **DDPG** algorithm as a means of training the model.
+Because DDPG can handle continuous action.
+## Network structure
+Since I am using the DDPG algorithm, there is an Actor and Critic, 
+Actor is actually PolicyGradient, Critic is the Value-Base algorithm, 
+and DDPG draws on the dual neural network and ReplayBuffer methods in DQN, 
+so Actor and Critic have their own Two neural networks of the same structure, 
+Actor's input state output the action, last layer use **tanh** to map the value between -1 and 1
+Critic's input state and action output the Q value
+but unlike DDPG and DQN, DDPG uses the SoftUpdate method, which updates TargetNet 
+in **tau(a hyperparameter)** probability every step.
+And each neural network has two hidden layers of **128** and **64** nodes.
+
+Let me briefly describe the learning process:
+
+The main loop is same as **DQN**, agent interacted with the environment, save the memory in replay buffer,
+When replay buffer is full and start learning,
+
+One step learning as follows:
+
+Sample memory from replay buffer,
+The mini batch includes: state(s), action(a), reward(r), next_state(s_), done
+
+First, 
+with no grad, 
+   from actor_target_net get s_'s action
+   then put both s_ and the action into critic_target_net, get the next_q_value
+   then use the formula r + gamma*next_q_value to get target_q_value
+then use the critci_eval_net to get s and a 's q_value
+calculate the loss between target_q_value and q_value by using MSE
+and backward critic_eval_net
+soft_update critic_target_net
+
+Second,
+from actor_eval_net get s's action
+get the negative mean value from critic_eval_net by s, a
+Treat this mean value as a loss
+and backward actor_eval_net
+soft_update actor_target_net
+
+
+
+
+
+## Hyper parameters
+- total_episode 4000
+- actor learning rate 0.0001
+- critic learning rate 0.0001
+- replay_buffer_size 2000
+- two hidden layers 128 and 64
+- mini_batch_size 128
+- discount_gamma 0.9
+- max step count 500
+- tau 0.001
+- var init 3
+- var decay 0.99
+## Project structure
+- Report.ipynb
+- agents.py (RL agent by DDPG)
+- models.py (Just neural networks implement by pytorch)
+- memory.py (Just origin replay buffer)
+- model_actor.pt (The actor train result saved model's file)
+- model_critic.pt (The critic train result saved model's file)
+Then open the Report.ipynb to see the report.
