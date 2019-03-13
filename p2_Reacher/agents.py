@@ -7,7 +7,7 @@ import torch.nn.functional as F
 from memorys import ReplayBuffer
 from models import Actor, Critic
 
-
+torch.manual_seed(7)
 class DDPG(object):
 
     def __init__(self, n_s,
@@ -96,3 +96,14 @@ class DDPG(object):
     def _soft_update(self, eval_net, target_net):
         for eval, target in zip(eval_net.parameters(), target_net.parameters()):
             target.data.copy_(self.tau * eval.data + (1.0 - self.tau) * target.data)
+
+    # save all net
+    def save(self, name):
+        torch.save(self.eval_actor, '{}_actor.pt'.format(name))
+        torch.save(self.eval_critic, '{}_critic.pt'.format(name))
+
+    # load all net
+    def load(self, name):
+        actor = torch.load('{}_actor.pt'.format(name))
+        critic = torch.load('{}_critic.pt'.format(name))
+        return actor, critic

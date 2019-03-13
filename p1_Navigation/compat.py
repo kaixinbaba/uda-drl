@@ -1,6 +1,8 @@
 """compat with cpu and gpu"""
 import torch
 
+torch.manual_seed(7)
+
 use_gpu = torch.cuda.is_available()
 
 
